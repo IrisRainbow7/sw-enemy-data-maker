@@ -52,13 +52,17 @@ const removePart = (i: number) => {
   updateParts(props.modelValue.filter((_, idx) => idx !== i))
 }
 
+const totalSwordFragment = computed(() =>
+  props.modelValue.reduce((sum, p) => sum + p.swordFragment, 0),
+)
+
 const accuracySuffixes = computed(() => props.modelValue.map((p) => `（${p.accuracy + 7}）`))
 const evasionSuffixes = computed(() => props.modelValue.map((p) => `（${p.evasion + 7}）`))
 
 const accuracySuffixAt = (i: number) => accuracySuffixes.value[i] ?? ''
 const evasionSuffixAt = (i: number) => evasionSuffixes.value[i] ?? ''
-const hpSuffix = (count: number) => `+(${count * 5})`
-const mpSuffix = (count: number) => `+(${count})`
+const hpSuffix = (sword: number) => `+(${sword * 5})`
+const mpSuffix = (sword: number) => `+(${sword})`
 </script>
 
 <template>
@@ -103,9 +107,9 @@ const mpSuffix = (count: number) => `+(${count})`
 
         <NumberField v-model="part.defense" label="防護点" suffix="" />
 
-        <NumberField v-model="part.hp" label="HP" :suffix="hpSuffix(props.modelValue.length)" />
+        <NumberField v-model="part.hp" label="HP" :suffix="hpSuffix(totalSwordFragment)" />
 
-        <NumberField v-model="part.mp" label="MP" :suffix="mpSuffix(props.modelValue.length)" />
+        <NumberField v-model="part.mp" label="MP" :suffix="mpSuffix(totalSwordFragment)" />
 
         <NumberField v-model="part.swordFragment" label="剣のかけら" suffix="" />
       </div>
