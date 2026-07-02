@@ -53,8 +53,8 @@ const onTemplateClick = (t: { label: string; value: string }) => {
     emit('mark-special-touched')
     return
   }
-  const normalized = current.endsWith('\n') ? current : `${current}\n`
-  special.value = `${normalized}\n${t.value}\n\n`
+  const trimmed = current.trimEnd()
+  special.value = `${trimmed}\n\n${t.value}\n\n`
   emit('mark-special-touched')
 }
 </script>
