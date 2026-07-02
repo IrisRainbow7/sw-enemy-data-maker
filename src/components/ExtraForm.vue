@@ -46,6 +46,13 @@ const onText = (setter: (v: string) => void) => (e: Event) => {
   setter(target.value)
 }
 
+const normalizeBlocks = (s: string) =>
+  s
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line !== '')
+    .join('\n')
+
 const onTemplateClick = (t: { label: string; value: string }) => {
   const current = special.value ?? ''
   if (current.trim() === '') {
@@ -53,6 +60,9 @@ const onTemplateClick = (t: { label: string; value: string }) => {
     emit('mark-special-touched')
     return
   }
+  const normalizedCurrent = normalizeBlocks(current)
+  const normalizedTemplate = normalizeBlocks(t.value)
+  if (normalizedCurrent.includes(normalizedTemplate)) return
   const trimmed = current.trimEnd()
   special.value = `${trimmed}\n\n${t.value}\n\n`
   emit('mark-special-touched')
