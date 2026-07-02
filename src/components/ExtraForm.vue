@@ -40,7 +40,7 @@ const onTemplateClick = (t: { label: string; value: string }) => {
       ></textarea>
 
       <details class="templates" open>
-        <summary class="templates__summary">テンプレート</summary>
+        <summary class="templates__summary">テンプレート（クリックで自動追加）</summary>
         <ul class="templates__list">
           <li v-for="t in SPECIAL_TEMPLATES" :key="t.label">
             <button type="button" class="template-btn" @click="onTemplateClick(t)">
