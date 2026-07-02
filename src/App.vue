@@ -55,39 +55,31 @@ onMounted(() => {
 
 const totalSwordFragment = computed(() => parts.value.reduce((sum, p) => sum + p.swordFragment, 0))
 
+const appendSpecial = (text: string) => {
+  const current = special.value.trim()
+  if (current === '') {
+    special.value = text
+    return
+  }
+  if (current.includes(text)) return
+  special.value = `${current}\n${text}`
+}
+
 watch(
   () => category.value,
   (next, prev) => {
     if (next === prev) return
     if (next === 'アンデッド') {
-      if (!autoFields.value.weakness.touched) {
-        weakness.value = '回復効果ダメージ+3点'
-        autoFields.value.weakness.value = weakness.value
-      }
-      if (!autoFields.value.impurity.touched) {
-        impurity.value = 5
-        autoFields.value.impurity.value = impurity.value
-      }
-      if (!autoFields.value.special.touched) {
-        special.value = '○毒無効、○病気無効、○精神効果属性(弱)無効'
-        autoFields.value.special.value = special.value
-      }
+      weakness.value = '回復効果ダメージ+3点'
+      impurity.value = 5
+      appendSpecial('○毒無効、○病気無効、○精神効果属性(弱)無効')
     } else if (next === '人族') {
-      if (!autoFields.value.weakness.touched) {
-        weakness.value = 'なし'
-        autoFields.value.weakness.value = weakness.value
-      }
+      weakness.value = 'なし'
     } else if (next === '魔法生物' || next === '魔動機' || next === '魔神') {
-      if (!autoFields.value.impurity.touched) {
-        impurity.value = 0
-        autoFields.value.impurity.value = impurity.value
-      }
+      impurity.value = 0
     }
     if (next === '魔法生物' || next === '魔動機') {
-      if (!autoFields.value.special.touched) {
-        special.value = '○毒無効、○病気無効、○精神効果属性無効'
-        autoFields.value.special.value = special.value
-      }
+      appendSpecial('○毒無効、○病気無効、○精神効果属性無効')
     }
   },
 )
@@ -181,6 +173,8 @@ const onClearHistory = () => {
   clearHistory()
   history.value = []
 }
+
+defineExpose({ enemy })
 </script>
 
 <template>
