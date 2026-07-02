@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Part } from '@/types/enemy'
 import NumberField from './NumberField.vue'
 
@@ -53,7 +54,11 @@ const removePart = (i: number) => {
   parts.value = parts.value.filter((_, idx) => idx !== i)
 }
 
-const accuracySuffix = (n: number) => `（${n + 7}）`
+const accuracySuffixes = computed(() => parts.value.map((p) => `（${p.accuracy + 7}）`))
+const evasionSuffixes = computed(() => parts.value.map((p) => `（${p.evasion + 7}）`))
+
+const accuracySuffixAt = (i: number) => accuracySuffixes.value[i] ?? ''
+const evasionSuffixAt = (i: number) => evasionSuffixes.value[i] ?? ''
 const hpSuffix = (count: number) => `+(${count * 5})`
 const mpSuffix = (count: number) => `+(${count})`
 </script>
@@ -92,7 +97,7 @@ const mpSuffix = (count: number) => `+(${count})`
         <NumberField
           :model-value="part.accuracy"
           label="命中力"
-          :suffix="accuracySuffix(part.accuracy)"
+          :suffix="accuracySuffixAt(i)"
           @update:model-value="onPartField(i, 'accuracy')"
         />
 
@@ -104,7 +109,7 @@ const mpSuffix = (count: number) => `+(${count})`
         <NumberField
           :model-value="part.evasion"
           label="回避力"
-          :suffix="accuracySuffix(part.evasion)"
+          :suffix="evasionSuffixAt(i)"
           @update:model-value="onPartField(i, 'evasion')"
         />
 
