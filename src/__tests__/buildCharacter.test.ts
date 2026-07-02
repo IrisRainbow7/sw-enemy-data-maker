@@ -121,6 +121,50 @@ describe('buildCharacterData', () => {
     expect(() => buildCharacterData(data)).not.toThrow()
   })
 
+  it('剣のかけらで強化後の HP/MP が status に反映される (部位ごと独立)', () => {
+    const data = makeEnemy({
+      parts: [
+        makePart({ rawName: '爪(右手)', hp: 20, mp: 5, swordFragment: 3 }),
+        makePart({ rawName: '牙(頭部)', hp: 30, mp: 10, swordFragment: 0 }),
+      ],
+    })
+    const status = buildCharacterData(data).data.status
+    expect(status[0]).toEqual({ label: '右手：HP', value: 35, max: 35 })
+    expect(status[1]).toEqual({ label: '右手：MP', value: 8, max: 8 })
+    expect(status[2]).toEqual({ label: '頭部：HP', value: 30, max: 30 })
+    expect(status[3]).toEqual({ label: '頭部：MP', value: 10, max: 10 })
+  })
+
+  it('剣のかけらで強化後の HP/MP が memo に反映される (部位ごと独立)', () => {
+    const data = makeEnemy({
+      parts: [
+        makePart({
+          rawName: '爪(右手)',
+          accuracy: 10,
+          damage: '1d+5',
+          evasion: 8,
+          defense: 3,
+          hp: 20,
+          mp: 5,
+          swordFragment: 3,
+        }),
+        makePart({
+          rawName: '牙(頭部)',
+          accuracy: 8,
+          damage: '2d+6',
+          evasion: 5,
+          defense: 2,
+          hp: 30,
+          mp: 10,
+          swordFragment: 0,
+        }),
+      ],
+    })
+    const memo = buildCharacterData(data).data.memo
+    expect(memo).toContain('爪(右手)/10(17)/1d+5/8(15)/3/35/8')
+    expect(memo).toContain('牙(頭部)/8(15)/2d+6/5(12)/2/30/10')
+  })
+
   it('character の基本プロパティが固定値で出力される', () => {
     const result = buildCharacterData(makeEnemy())
     expect(result.data.x).toBe(0)

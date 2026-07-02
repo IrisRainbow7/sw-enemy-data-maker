@@ -57,17 +57,15 @@ const removePart = (i: number) => {
   updateParts(props.modelValue.filter((_, idx) => idx !== i))
 }
 
-const totalSwordFragment = computed(() =>
-  props.modelValue.reduce((sum, p) => sum + p.swordFragment, 0),
-)
-
 const accuracySuffixes = computed(() => props.modelValue.map((p) => `（${p.accuracy + 7}）`))
 const evasionSuffixes = computed(() => props.modelValue.map((p) => `（${p.evasion + 7}）`))
+const hpSuffixes = computed(() => props.modelValue.map((p) => `+${p.swordFragment * 5}`))
+const mpSuffixes = computed(() => props.modelValue.map((p) => `+${p.swordFragment}`))
 
 const accuracySuffixAt = (i: number) => accuracySuffixes.value[i] ?? ''
 const evasionSuffixAt = (i: number) => evasionSuffixes.value[i] ?? ''
-const hpSuffix = (sword: number) => `+${sword * 5}`
-const mpSuffix = (sword: number) => `+${sword}`
+const hpSuffixAt = (i: number) => hpSuffixes.value[i] ?? ''
+const mpSuffixAt = (i: number) => mpSuffixes.value[i] ?? ''
 </script>
 
 <template>
@@ -130,14 +128,14 @@ const mpSuffix = (sword: number) => `+${sword}`
         <NumberField
           :model-value="part.hp"
           label="HP"
-          :suffix="hpSuffix(totalSwordFragment)"
+          :suffix="hpSuffixAt(i)"
           @update:model-value="onPartField(i, 'hp')"
         />
 
         <NumberField
           :model-value="part.mp"
           label="MP"
-          :suffix="mpSuffix(totalSwordFragment)"
+          :suffix="mpSuffixAt(i)"
           @update:model-value="onPartField(i, 'mp')"
         />
 

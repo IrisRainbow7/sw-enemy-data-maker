@@ -7,8 +7,10 @@ const buildStatus = (data: EnemyData) => {
   for (const p of data.parts) {
     const { part } = parsePartName(p.rawName)
     const label = part === '' ? p.rawName || '(無名)' : part
-    status.push({ label: `${label}：HP`, value: p.hp, max: p.hp })
-    status.push({ label: `${label}：MP`, value: p.mp, max: p.mp })
+    const enhancedHp = p.hp + p.swordFragment * 5
+    const enhancedMp = p.mp + p.swordFragment
+    status.push({ label: `${label}：HP`, value: enhancedHp, max: enhancedHp })
+    status.push({ label: `${label}：MP`, value: enhancedMp, max: enhancedMp })
   }
   return status
 }
@@ -35,7 +37,9 @@ const buildMemo = (data: EnemyData): string => {
   const partsLines = data.parts
     .map((p) => {
       const raw = p.rawName === '' ? '(無名)' : p.rawName
-      return `${raw}/${p.accuracy}(${p.accuracy + 7})/${p.damage}/${p.evasion}(${p.evasion + 7})/${p.defense}/${p.hp}/${p.mp}`
+      const enhancedHp = p.hp + p.swordFragment * 5
+      const enhancedMp = p.mp + p.swordFragment
+      return `${raw}/${p.accuracy}(${p.accuracy + 7})/${p.damage}/${p.evasion}(${p.evasion + 7})/${p.defense}/${enhancedHp}/${enhancedMp}`
     })
     .join('\n')
 
