@@ -2,6 +2,7 @@
 import type { Category, Intelligence, Perception, Reaction } from '@/types/enemy'
 import { CATEGORIES, INTELLIGENCES, PERCEPTIONS, REACTIONS } from '@/types/enemy'
 import NumberField from './NumberField.vue'
+import { resistBonus } from '@/utils/resist'
 
 const category = defineModel<Category>('category', { required: true })
 const name = defineModel<string>('name', { required: true })
@@ -55,7 +56,7 @@ const onSelectInput =
   }
 
 const resistSuffix = (n: number, totalSword: number) => {
-  const bonus = Math.floor(totalSword / 5)
+  const bonus = resistBonus(totalSword)
   return `+${bonus}（${n + bonus + 7}）`
 }
 </script>
