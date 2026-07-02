@@ -1,34 +1,32 @@
 <script setup lang="ts">
-interface Props {
-  modelValue: number
-  label: string
-  suffix: string
-  min?: number
-  step?: number
-}
+const modelValue = defineModel<number>({ required: true })
 
-const props = withDefaults(defineProps<Props>(), {
-  min: 0,
-  step: 1,
-})
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', v: number): void
-}>()
+withDefaults(
+  defineProps<{
+    label: string
+    suffix: string
+    min?: number
+    step?: number
+  }>(),
+  {
+    min: 0,
+    step: 1,
+  },
+)
 
 const onInput = (e: Event) => {
   const target = e.target as HTMLInputElement
   const raw = target.value
-  const parsed = raw === '' ? 0 : Number(raw)
+  if (raw === '') {
+    modelValue.value = 0
+    return
+  }
+  const parsed = Number(raw)
   if (Number.isNaN(parsed)) {
-    emit('update:modelValue', 0)
+    modelValue.value = 0
     return
   }
-  if (parsed < props.min) {
-    emit('update:modelValue', props.min)
-    return
-  }
-  emit('update:modelValue', parsed)
+  modelValue.value = parsed
 }
 </script>
 

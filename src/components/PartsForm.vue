@@ -3,14 +3,21 @@ import { computed } from 'vue'
 import type { Part } from '@/types/enemy'
 import NumberField from './NumberField.vue'
 
-const parts = defineModel<Part[]>('modelValue', { required: true })
+const props = defineProps<{ modelValue: Part[] }>()
+const emit = defineEmits<{
+  (e: 'update:modelValue', v: Part[]): void
+}>()
+
+const updateParts = (next: Part[]) => {
+  emit('update:modelValue', next)
+}
 
 const setAt = (i: number, patch: Partial<Part>) => {
-  const next = parts.value.slice()
+  const next = props.modelValue.slice()
   const current = next[i]
   if (current === undefined) return
   next[i] = { ...current, ...patch }
-  parts.value = next
+  updateParts(next)
 }
 
 const onRawName = (i: number) => (e: Event) => {
@@ -23,18 +30,9 @@ const onDamage = (i: number) => (e: Event) => {
   setAt(i, { damage: target.value })
 }
 
-const onPartField =
-  <K extends 'accuracy' | 'evasion' | 'defense' | 'hp' | 'mp' | 'swordFragment'>(
-    i: number,
-    key: K,
-  ) =>
-  (v: number) => {
-    setAt(i, { [key]: v } as Pick<Part, K>)
-  }
-
 const addPart = () => {
-  parts.value = [
-    ...parts.value,
+  updateParts([
+    ...props.modelValue,
     {
       id: crypto.randomUUID(),
       rawName: '',
@@ -46,16 +44,16 @@ const addPart = () => {
       mp: 0,
       swordFragment: 0,
     },
-  ]
+  ])
 }
 
 const removePart = (i: number) => {
-  if (parts.value.length <= 1) return
-  parts.value = parts.value.filter((_, idx) => idx !== i)
+  if (props.modelValue.length <= 1) return
+  updateParts(props.modelValue.filter((_, idx) => idx !== i))
 }
 
-const accuracySuffixes = computed(() => parts.value.map((p) => `（${p.accuracy + 7}）`))
-const evasionSuffixes = computed(() => parts.value.map((p) => `（${p.evasion + 7}）`))
+const accuracySuffixes = computed(() => props.modelValue.map((p) => `（${p.accuracy + 7}）`))
+const evasionSuffixes = computed(() => props.modelValue.map((p) => `（${p.evasion + 7}）`))
 
 const accuracySuffixAt = (i: number) => accuracySuffixes.value[i] ?? ''
 const evasionSuffixAt = (i: number) => evasionSuffixes.value[i] ?? ''
@@ -70,11 +68,11 @@ const mpSuffix = (count: number) => `+(${count})`
       <button type="button" class="btn btn--add" @click="addPart">＋ 部位を追加</button>
     </div>
 
-    <div v-for="(part, i) in parts" :key="part.id" class="part-card">
+    <div v-for="(part, i) in props.modelValue" :key="part.id" class="part-card">
       <div class="part-card__header">
         <span class="part-card__index">部位 #{{ i + 1 }}</span>
         <button
-          v-if="parts.length > 1"
+          v-if="props.modelValue.length > 1"
           type="button"
           class="btn btn--remove"
           @click="removePart(i)"
@@ -94,52 +92,22 @@ const mpSuffix = (count: number) => `+(${count})`
           />
         </label>
 
-        <NumberField
-          :model-value="part.accuracy"
-          label="命中力"
-          :suffix="accuracySuffixAt(i)"
-          @update:model-value="onPartField(i, 'accuracy')"
-        />
+        <NumberField v-model="part.accuracy" label="命中力" :suffix="accuracySuffixAt(i)" />
 
         <label class="field">
           <span class="field__label">打撃点</span>
           <input type="text" :value="part.damage" @input="onDamage(i)" />
         </label>
 
-        <NumberField
-          :model-value="part.evasion"
-          label="回避力"
-          :suffix="evasionSuffixAt(i)"
-          @update:model-value="onPartField(i, 'evasion')"
-        />
+        <NumberField v-model="part.evasion" label="回避力" :suffix="evasionSuffixAt(i)" />
 
-        <NumberField
-          :model-value="part.defense"
-          label="防護点"
-          suffix=""
-          @update:model-value="onPartField(i, 'defense')"
-        />
+        <NumberField v-model="part.defense" label="防護点" suffix="" />
 
-        <NumberField
-          :model-value="part.hp"
-          label="HP"
-          :suffix="hpSuffix(parts.length)"
-          @update:model-value="onPartField(i, 'hp')"
-        />
+        <NumberField v-model="part.hp" label="HP" :suffix="hpSuffix(props.modelValue.length)" />
 
-        <NumberField
-          :model-value="part.mp"
-          label="MP"
-          :suffix="mpSuffix(parts.length)"
-          @update:model-value="onPartField(i, 'mp')"
-        />
+        <NumberField v-model="part.mp" label="MP" :suffix="mpSuffix(props.modelValue.length)" />
 
-        <NumberField
-          :model-value="part.swordFragment"
-          label="剣のかけら"
-          suffix=""
-          @update:model-value="onPartField(i, 'swordFragment')"
-        />
+        <NumberField v-model="part.swordFragment" label="剣のかけら" suffix="" />
       </div>
     </div>
   </section>
