@@ -165,6 +165,16 @@ describe('buildCharacterData', () => {
     expect(memo).toContain('牙(頭部)/8(15)/2d+6/5(12)/2/30/10')
   })
 
+  it('部位が1つのとき status の label に部位名を含めない', () => {
+    const data = makeEnemy({
+      parts: [makePart({ rawName: '爪(右手)', hp: 20, mp: 5 })],
+    })
+    const status = buildCharacterData(data).data.status
+    expect(status).toHaveLength(2)
+    expect(status[0]).toEqual({ label: 'HP', value: 20, max: 20 })
+    expect(status[1]).toEqual({ label: 'MP', value: 5, max: 5 })
+  })
+
   it('character の基本プロパティが固定値で出力される', () => {
     const result = buildCharacterData(makeEnemy())
     expect(result.data.x).toBe(0)

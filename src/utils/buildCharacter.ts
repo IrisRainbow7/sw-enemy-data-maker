@@ -4,13 +4,16 @@ import { parsePartName } from './parser'
 
 const buildStatus = (data: EnemyData) => {
   const status: { label: string; value: number; max: number }[] = []
+  const singlePart = data.parts.length === 1
   for (const p of data.parts) {
     const { part } = parsePartName(p.rawName)
     const label = part === '' ? p.rawName || '(無名)' : part
     const enhancedHp = p.hp + p.swordFragment * 5
     const enhancedMp = p.mp + p.swordFragment
-    status.push({ label: `${label}：HP`, value: enhancedHp, max: enhancedHp })
-    status.push({ label: `${label}：MP`, value: enhancedMp, max: enhancedMp })
+    const hpLabel = singlePart ? 'HP' : `${label}：HP`
+    const mpLabel = singlePart ? 'MP' : `${label}：MP`
+    status.push({ label: hpLabel, value: enhancedHp, max: enhancedHp })
+    status.push({ label: mpLabel, value: enhancedMp, max: enhancedMp })
   }
   return status
 }
