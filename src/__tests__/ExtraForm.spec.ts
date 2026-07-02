@@ -8,6 +8,18 @@ const ZENRYOKU =
   '🗨全力攻撃Ⅰ\n打撃点を+4点します。リスクとして、自身の回避判定に-2のペナルティ修正をします。'
 
 describe('ExtraForm', () => {
+  it('手動入力が v-model 経由で反映される', async () => {
+    const wrapper = mount(ExtraForm, {
+      props: { special: '', loot: '' },
+    })
+    const textarea = wrapper.find('textarea')
+    await textarea.setValue('手動で入力')
+    const events = wrapper.emitted('update:special')
+    expect(events).toBeDefined()
+    if (!events) throw new Error('event not emitted')
+    expect(events[0]).toEqual(['手動で入力'])
+  })
+
   it('空欄時はテンプレートをそのまま追加する', async () => {
     const wrapper = mount(ExtraForm, {
       props: { special: '', loot: '' },

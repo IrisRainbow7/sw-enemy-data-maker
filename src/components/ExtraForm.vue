@@ -41,11 +41,6 @@ const SPECIAL_TEMPLATES: { label: string; value: string }[] = [
   },
 ]
 
-const onText = (setter: (v: string) => void) => (e: Event) => {
-  const target = e.target as HTMLTextAreaElement
-  setter(target.value)
-}
-
 const normalizeBlocks = (s: string) =>
   s
     .split('\n')
@@ -75,12 +70,7 @@ const onTemplateClick = (t: { label: string; value: string }) => {
       <div class="field__row">
         <span class="field__label">特殊能力</span>
       </div>
-      <textarea
-        rows="5"
-        :value="special"
-        placeholder="複数行入力可"
-        @input="onText((v) => (special = v))"
-      ></textarea>
+      <textarea rows="5" v-model="special" placeholder="複数行入力可"></textarea>
 
       <details class="templates" open>
         <summary class="templates__summary">テンプレート（クリックで自動追加）</summary>
@@ -96,12 +86,7 @@ const onTemplateClick = (t: { label: string; value: string }) => {
 
     <div class="field">
       <span class="field__label">戦利品</span>
-      <textarea
-        rows="5"
-        :value="loot"
-        placeholder="複数行入力可"
-        @input="onText((v) => (loot = v))"
-      ></textarea>
+      <textarea rows="5" v-model="loot" placeholder="複数行入力可"></textarea>
     </div>
   </section>
 </template>
