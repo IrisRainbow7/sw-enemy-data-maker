@@ -61,8 +61,8 @@ const evasionSuffixes = computed(() => props.modelValue.map((p) => `（${p.evasi
 
 const accuracySuffixAt = (i: number) => accuracySuffixes.value[i] ?? ''
 const evasionSuffixAt = (i: number) => evasionSuffixes.value[i] ?? ''
-const hpSuffix = (sword: number) => `+(${sword * 5})`
-const mpSuffix = (sword: number) => `+(${sword})`
+const hpSuffix = (sword: number) => `+${sword * 5}`
+const mpSuffix = (sword: number) => `+${sword}`
 </script>
 
 <template>
