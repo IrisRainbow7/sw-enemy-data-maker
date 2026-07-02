@@ -1,8 +1,7 @@
 <script setup lang="ts">
-const modelValue = defineModel<number>({ required: true })
-
 withDefaults(
   defineProps<{
+    modelValue: number
     label: string
     suffix: string
     min?: number
@@ -14,19 +13,23 @@ withDefaults(
   },
 )
 
+const emit = defineEmits<{
+  (e: 'update:modelValue', v: number): void
+}>()
+
 const onInput = (e: Event) => {
   const target = e.target as HTMLInputElement
   const raw = target.value
   if (raw === '') {
-    modelValue.value = 0
+    emit('update:modelValue', 0)
     return
   }
   const parsed = Number(raw)
   if (Number.isNaN(parsed)) {
-    modelValue.value = 0
+    emit('update:modelValue', 0)
     return
   }
-  modelValue.value = parsed
+  emit('update:modelValue', parsed)
 }
 </script>
 
