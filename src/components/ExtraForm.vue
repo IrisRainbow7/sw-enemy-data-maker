@@ -48,8 +48,13 @@ const onText = (setter: (v: string) => void) => (e: Event) => {
 
 const onTemplateClick = (t: { label: string; value: string }) => {
   const current = special.value ?? ''
-  const next = current.trim() === '' ? t.value : `${current}\n${t.value}`
-  special.value = next
+  if (current.trim() === '') {
+    special.value = t.value
+    emit('mark-special-touched')
+    return
+  }
+  const normalized = current.endsWith('\n') ? current : `${current}\n`
+  special.value = `${normalized}\n${t.value}\n\n`
   emit('mark-special-touched')
 }
 </script>
