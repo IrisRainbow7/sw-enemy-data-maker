@@ -1,27 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import type { Part } from '@/types/enemy'
 import NumberField from './NumberField.vue'
 
 const parts = defineModel<Part[]>('modelValue', { required: true })
-
-const setAt = (i: number, patch: Partial<Part>) => {
-  const next = parts.value.slice()
-  const current = next[i]
-  if (current === undefined) return
-  next[i] = { ...current, ...patch }
-  parts.value = next
-}
-
-const onRawName = (i: number) => (e: Event) => {
-  const target = e.target as HTMLInputElement
-  setAt(i, { rawName: target.value })
-}
-
-const onDamage = (i: number) => (e: Event) => {
-  const target = e.target as HTMLInputElement
-  setAt(i, { damage: target.value })
-}
 
 const addPart = () => {
   parts.value = [
@@ -45,15 +26,10 @@ const removePart = (i: number) => {
   parts.value = parts.value.filter((_, idx) => idx !== i)
 }
 
-const accuracySuffixes = computed(() => parts.value.map((p) => `（${p.accuracy + 7}）`))
-const evasionSuffixes = computed(() => parts.value.map((p) => `（${p.evasion + 7}）`))
-const hpSuffixes = computed(() => parts.value.map((p) => `+${p.swordFragment * 5}`))
-const mpSuffixes = computed(() => parts.value.map((p) => `+${p.swordFragment}`))
-
-const accuracySuffixAt = (i: number) => accuracySuffixes.value[i] ?? ''
-const evasionSuffixAt = (i: number) => evasionSuffixes.value[i] ?? ''
-const hpSuffixAt = (i: number) => hpSuffixes.value[i] ?? ''
-const mpSuffixAt = (i: number) => mpSuffixes.value[i] ?? ''
+const accuracySuffix = (n: number) => `（${n + 7}）`
+const evasionSuffix = (n: number) => `（${n + 7}）`
+const hpSuffix = (sword: number) => `+${sword * 5}`
+const mpSuffix = (sword: number) => `+${sword}`
 </script>
 
 <template>
@@ -79,60 +55,29 @@ const mpSuffixAt = (i: number) => mpSuffixes.value[i] ?? ''
       <div class="grid">
         <label class="field field--wide">
           <span class="field__label">攻撃方法(部位)</span>
-          <input
-            type="text"
-            :value="part.rawName"
-            placeholder="例: 爪(右手)"
-            @input="onRawName(i)"
-          />
+          <input v-model="part.rawName" type="text" placeholder="例: 爪(右手)" />
         </label>
 
         <NumberField
-          :model-value="part.accuracy"
+          v-model="part.accuracy"
           label="命中力"
-          :suffix="accuracySuffixAt(i)"
-          @update:model-value="(v: number) => setAt(i, { accuracy: v })"
+          :suffix="accuracySuffix(part.accuracy)"
         />
 
         <label class="field">
           <span class="field__label">打撃点</span>
-          <input type="text" :value="part.damage" @input="onDamage(i)" />
+          <input v-model="part.damage" type="text" />
         </label>
 
-        <NumberField
-          :model-value="part.evasion"
-          label="回避力"
-          :suffix="evasionSuffixAt(i)"
-          @update:model-value="(v: number) => setAt(i, { evasion: v })"
-        />
+        <NumberField v-model="part.evasion" label="回避力" :suffix="evasionSuffix(part.evasion)" />
 
-        <NumberField
-          :model-value="part.defense"
-          label="防護点"
-          suffix=""
-          @update:model-value="(v: number) => setAt(i, { defense: v })"
-        />
+        <NumberField v-model="part.defense" label="防護点" suffix="" />
 
-        <NumberField
-          :model-value="part.hp"
-          label="HP"
-          :suffix="hpSuffixAt(i)"
-          @update:model-value="(v: number) => setAt(i, { hp: v })"
-        />
+        <NumberField v-model="part.hp" label="HP" :suffix="hpSuffix(part.swordFragment)" />
 
-        <NumberField
-          :model-value="part.mp"
-          label="MP"
-          :suffix="mpSuffixAt(i)"
-          @update:model-value="(v: number) => setAt(i, { mp: v })"
-        />
+        <NumberField v-model="part.mp" label="MP" :suffix="mpSuffix(part.swordFragment)" />
 
-        <NumberField
-          :model-value="part.swordFragment"
-          label="剣のかけら"
-          suffix=""
-          @update:model-value="(v: number) => setAt(i, { swordFragment: v })"
-        />
+        <NumberField v-model="part.swordFragment" label="剣のかけら" suffix="" />
       </div>
     </div>
   </section>

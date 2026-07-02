@@ -148,48 +148,26 @@ const resistSuffix = (n: number, totalSword: number) => {
         />
       </label>
 
-      <NumberField
-        :model-value="fame"
-        label="知名度"
-        suffix=""
-        @update:model-value="(v: number) => (fame = v)"
-      />
-      <NumberField
-        :model-value="weaknessValue"
-        label="弱点値"
-        suffix=""
-        @update:model-value="(v: number) => (weaknessValue = v)"
-      />
+      <NumberField v-model="fame" label="知名度" suffix="" />
+      <NumberField v-model="weaknessValue" label="弱点値" suffix="" />
 
       <label class="field field--wide">
         <span class="field__label">弱点</span>
         <input type="text" :value="weakness" @input="onTextInput((v) => (weakness = v))" />
       </label>
 
-      <NumberField
-        :model-value="initiative"
-        label="先制値"
-        suffix=""
-        @update:model-value="(v: number) => (initiative = v)"
-      />
-      <NumberField
-        :model-value="speed"
-        label="移動速度"
-        suffix=""
-        @update:model-value="(v: number) => (speed = v)"
-      />
+      <NumberField v-model="initiative" label="先制値" suffix="" />
+      <NumberField v-model="speed" label="移動速度" suffix="" />
 
       <NumberField
-        :model-value="lifeResist"
+        v-model="lifeResist"
         label="生命抵抗力"
         :suffix="resistSuffix(lifeResist, totalSwordFragment)"
-        @update:model-value="(v: number) => (lifeResist = v)"
       />
       <NumberField
-        :model-value="mindResist"
+        v-model="mindResist"
         label="精神抵抗力"
         :suffix="resistSuffix(mindResist, totalSwordFragment)"
-        @update:model-value="(v: number) => (mindResist = v)"
       />
     </div>
   </section>

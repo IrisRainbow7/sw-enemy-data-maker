@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, ref, toRefs, watch } from 'vue'
 import BasicInfoForm from '@/components/BasicInfoForm.vue'
 import ExtraForm from '@/components/ExtraForm.vue'
 import HistoryPanel from '@/components/HistoryPanel.vue'
 import PartsForm from '@/components/PartsForm.vue'
-import { createEmptyEnemy, type Category, type EnemyData } from '@/types/enemy'
+import { createEmptyEnemy, type EnemyData } from '@/types/enemy'
 import { buildCharacterData } from '@/utils/buildCharacter'
 import { clearHistory, loadHistory, removeFromHistory, saveToHistory } from '@/utils/storage'
 
@@ -13,8 +13,30 @@ interface AutoField {
   touched: boolean
 }
 
-const enemy = reactive<EnemyData>(createEmptyEnemy())
-const autoFields = reactive<{
+const enemy = ref<EnemyData>(createEmptyEnemy())
+const {
+  category,
+  name,
+  level,
+  intelligence,
+  perception,
+  reaction,
+  impurity,
+  language,
+  habitat,
+  fame,
+  weaknessValue,
+  weakness,
+  initiative,
+  speed,
+  lifeResist,
+  mindResist,
+  parts,
+  special,
+  loot,
+} = toRefs(enemy.value)
+
+const autoFields = ref<{
   weakness: AutoField
   impurity: AutoField
   special: AutoField
@@ -31,103 +53,107 @@ onMounted(() => {
   history.value = loadHistory()
 })
 
-const totalSwordFragment = computed(() => enemy.parts.reduce((sum, p) => sum + p.swordFragment, 0))
+const totalSwordFragment = computed(() => parts.value.reduce((sum, p) => sum + p.swordFragment, 0))
 
 watch(
-  () => enemy.category,
+  () => category.value,
   (next, prev) => {
     if (next === prev) return
     if (next === 'アンデッド') {
-      if (!autoFields.weakness.touched) {
-        enemy.weakness = '回復効果ダメージ+3点'
-        autoFields.weakness.value = enemy.weakness
+      if (!autoFields.value.weakness.touched) {
+        weakness.value = '回復効果ダメージ+3点'
+        autoFields.value.weakness.value = weakness.value
       }
-      if (!autoFields.impurity.touched) {
-        enemy.impurity = 5
-        autoFields.impurity.value = enemy.impurity
+      if (!autoFields.value.impurity.touched) {
+        impurity.value = 5
+        autoFields.value.impurity.value = impurity.value
       }
-      if (!autoFields.special.touched) {
-        enemy.special = '○毒無効、○病気無効、○精神効果属性(弱)無効'
-        autoFields.special.value = enemy.special
+      if (!autoFields.value.special.touched) {
+        special.value = '○毒無効、○病気無効、○精神効果属性(弱)無効'
+        autoFields.value.special.value = special.value
       }
     } else if (next === '人族') {
-      if (!autoFields.weakness.touched) {
-        enemy.weakness = 'なし'
-        autoFields.weakness.value = enemy.weakness
+      if (!autoFields.value.weakness.touched) {
+        weakness.value = 'なし'
+        autoFields.value.weakness.value = weakness.value
       }
     } else if (next === '魔法生物' || next === '魔動機' || next === '魔神') {
-      if (!autoFields.impurity.touched) {
-        enemy.impurity = 0
-        autoFields.impurity.value = enemy.impurity
+      if (!autoFields.value.impurity.touched) {
+        impurity.value = 0
+        autoFields.value.impurity.value = impurity.value
       }
     }
     if (next === '魔法生物' || next === '魔動機') {
-      if (!autoFields.special.touched) {
-        enemy.special = '○毒無効、○病気無効、○精神効果属性無効'
-        autoFields.special.value = enemy.special
+      if (!autoFields.value.special.touched) {
+        special.value = '○毒無効、○病気無効、○精神効果属性無効'
+        autoFields.value.special.value = special.value
       }
     }
   },
 )
 
 const markWeaknessTouched = () => {
-  autoFields.weakness.touched = true
-  autoFields.weakness.value = enemy.weakness
+  autoFields.value.weakness.touched = true
+  autoFields.value.weakness.value = weakness.value
 }
 
 const markImpurityTouched = () => {
-  autoFields.impurity.touched = true
-  autoFields.impurity.value = enemy.impurity
+  autoFields.value.impurity.touched = true
+  autoFields.value.impurity.value = impurity.value
 }
 
 const markSpecialTouched = () => {
-  autoFields.special.touched = true
-  autoFields.special.value = enemy.special
+  autoFields.value.special.touched = true
+  autoFields.value.special.value = special.value
 }
 
 watch(
-  () => enemy.weakness,
+  () => weakness.value,
   () => {
-    if (enemy.weakness !== autoFields.weakness.value) {
+    if (weakness.value !== autoFields.value.weakness.value) {
       markWeaknessTouched()
     }
   },
 )
 
 watch(
-  () => enemy.impurity,
+  () => impurity.value,
   () => {
-    if (enemy.impurity !== autoFields.impurity.value) {
+    if (impurity.value !== autoFields.value.impurity.value) {
       markImpurityTouched()
     }
   },
 )
 
 watch(
-  () => enemy.special,
+  () => special.value,
   () => {
-    if (enemy.special !== autoFields.special.value) {
+    if (special.value !== autoFields.value.special.value) {
       markSpecialTouched()
     }
   },
 )
 
 const resetAutoFields = () => {
-  autoFields.weakness = { value: '', touched: false }
-  autoFields.impurity = { value: 0, touched: false }
-  autoFields.special = { value: '', touched: false }
+  autoFields.value = {
+    weakness: { value: '', touched: false },
+    impurity: { value: 0, touched: false },
+    special: { value: '', touched: false },
+  }
 }
 
 const fillEnemy = (data: EnemyData) => {
-  Object.assign(enemy, createEmptyEnemy(), {
-    ...data,
-    parts: data.parts.map((p) => ({ ...p, id: p.id || crypto.randomUUID() })),
+  Object.assign(enemy.value, createEmptyEnemy(), data, {
+    parts: data.parts.map((p) => ({
+      ...p,
+      id: p.id || crypto.randomUUID(),
+    })),
   })
   resetAutoFields()
 }
 
 const onCopy = async () => {
-  const payload = buildCharacterData(enemy)
+  const payload = buildCharacterData(enemy.value)
   const text = JSON.stringify(payload)
   try {
     await navigator.clipboard.writeText(text)
@@ -137,7 +163,7 @@ const onCopy = async () => {
     console.warn('Clipboard write failed')
     return
   }
-  history.value = saveToHistory(enemy)
+  history.value = saveToHistory(enemy.value)
   setTimeout(() => {
     copyStatus.value = ''
   }, 2000)
@@ -155,8 +181,6 @@ const onClearHistory = () => {
   clearHistory()
   history.value = []
 }
-
-void markWeaknessTouched
 </script>
 
 <template>
@@ -171,31 +195,31 @@ void markWeaknessTouched
 
     <main class="app__main">
       <BasicInfoForm
-        v-model:category="enemy.category as Category"
-        v-model:name="enemy.name"
-        v-model:level="enemy.level"
-        v-model:intelligence="enemy.intelligence"
-        v-model:perception="enemy.perception"
-        v-model:reaction="enemy.reaction"
-        v-model:impurity="enemy.impurity"
-        v-model:language="enemy.language"
-        v-model:habitat="enemy.habitat"
-        v-model:fame="enemy.fame"
-        v-model:weakness-value="enemy.weaknessValue"
-        v-model:weakness="enemy.weakness"
-        v-model:initiative="enemy.initiative"
-        v-model:speed="enemy.speed"
-        v-model:life-resist="enemy.lifeResist"
-        v-model:mind-resist="enemy.mindResist"
+        v-model:category="category"
+        v-model:name="name"
+        v-model:level="level"
+        v-model:intelligence="intelligence"
+        v-model:perception="perception"
+        v-model:reaction="reaction"
+        v-model:impurity="impurity"
+        v-model:language="language"
+        v-model:habitat="habitat"
+        v-model:fame="fame"
+        v-model:weakness-value="weaknessValue"
+        v-model:weakness="weakness"
+        v-model:initiative="initiative"
+        v-model:speed="speed"
+        v-model:life-resist="lifeResist"
+        v-model:mind-resist="mindResist"
         :total-sword-fragment="totalSwordFragment"
         :min-level="1"
       />
 
-      <PartsForm v-model="enemy.parts" />
+      <PartsForm v-model="parts" />
 
       <ExtraForm
-        v-model:special="enemy.special"
-        v-model:loot="enemy.loot"
+        v-model:special="special"
+        v-model:loot="loot"
         @mark-special-touched="markSpecialTouched"
       />
 
@@ -258,7 +282,7 @@ h1 {
 .btn--primary {
   background: #d9eaff;
   border-color: #6699cc;
-  color: #1f3f6e;
+  color: #1f3e6e;
   font-weight: 600;
 }
 
