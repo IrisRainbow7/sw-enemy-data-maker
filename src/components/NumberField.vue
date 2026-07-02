@@ -1,11 +1,12 @@
 <script setup lang="ts">
 const modelValue = defineModel<number>({ required: true })
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     label: string
     suffix: string
     min?: number
+    max?: number
     step?: number
   }>(),
   {
@@ -18,12 +19,20 @@ const onInput = (e: Event) => {
   const target = e.target as HTMLInputElement
   const raw = target.value
   if (raw === '') {
-    modelValue.value = 0
+    modelValue.value = props.min
     return
   }
   const parsed = Number(raw)
   if (Number.isNaN(parsed)) {
-    modelValue.value = 0
+    modelValue.value = props.min
+    return
+  }
+  if (parsed < props.min) {
+    modelValue.value = props.min
+    return
+  }
+  if (props.max !== undefined && parsed > props.max) {
+    modelValue.value = props.max
     return
   }
   modelValue.value = parsed

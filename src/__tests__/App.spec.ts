@@ -71,4 +71,23 @@ describe('App', () => {
     await selectCategory(wrapper, '魔法生物')
     expect(wrapper.vm.enemy.special).toBe('○毒無効、○病気無効、○精神効果属性無効')
   })
+
+  it('数字入力しても言語と生息地がリセットされない', async () => {
+    const wrapper = mount(App)
+    wrapper.vm.enemy.language = 'ゴブリン語'
+    wrapper.vm.enemy.habitat = '森林'
+    await wrapper.vm.$nextTick()
+
+    const numberInputs = wrapper.findAll('input[type="number"]')
+    const fameInput = numberInputs.find((input) => {
+      const label = input.element.closest('label')
+      return label?.textContent?.includes('知名度')
+    })
+    expect(fameInput).toBeDefined()
+    await fameInput!.setValue('10')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.enemy.language).toBe('ゴブリン語')
+    expect(wrapper.vm.enemy.habitat).toBe('森林')
+  })
 })

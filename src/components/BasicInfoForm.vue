@@ -28,33 +28,6 @@ defineProps<{
   minLevel: number
 }>()
 
-const onNumberInput = (e: Event, min: number, fallback: number): number => {
-  const target = e.target as HTMLInputElement
-  const raw = target.value
-  if (raw === '') return fallback
-  const parsed = Number(raw)
-  if (Number.isNaN(parsed)) return fallback
-  if (parsed < min) return min
-  return parsed
-}
-
-const onNameInput = (e: Event) => {
-  const target = e.target as HTMLInputElement
-  name.value = target.value
-}
-
-const onTextInput = (setter: (v: string) => void) => (e: Event) => {
-  const target = e.target as HTMLInputElement | HTMLTextAreaElement
-  setter(target.value)
-}
-
-const onSelectInput =
-  <T extends string>(setter: (v: T) => void) =>
-  (e: Event) => {
-    const target = e.target as HTMLSelectElement
-    setter(target.value as T)
-  }
-
 const resistSuffix = (n: number, totalSword: number) => {
   const bonus = resistBonus(totalSword)
   return `+${bonus}（${n + bonus + 7}）`
@@ -67,85 +40,49 @@ const resistSuffix = (n: number, totalSword: number) => {
     <div class="grid">
       <label class="field">
         <span class="field__label">分類</span>
-        <select :value="category" @change="onSelectInput<Category>((v) => (category = v))($event)">
+        <select v-model="category">
           <option v-for="c in CATEGORIES" :key="c" :value="c">{{ c }}</option>
         </select>
       </label>
 
       <label class="field">
         <span class="field__label">名称</span>
-        <input type="text" :value="name" placeholder="例: ゴブリン" @input="onNameInput" />
+        <input type="text" v-model="name" placeholder="例: ゴブリン" />
       </label>
 
-      <label class="field">
-        <span class="field__label">レベル</span>
-        <input
-          type="number"
-          :min="minLevel"
-          step="1"
-          :value="level"
-          @input="(e) => (level = onNumberInput(e, minLevel, 1))"
-        />
-      </label>
+      <NumberField v-model="level" label="レベル" suffix="" :min="minLevel" :step="1" />
 
       <label class="field">
         <span class="field__label">知能</span>
-        <select
-          :value="intelligence"
-          @change="onSelectInput<Intelligence>((v) => (intelligence = v))($event)"
-        >
-          <option v-for="i in INTELLIGENCES" :key="i" :value="i">
-            {{ i }}
-          </option>
+        <select v-model="intelligence">
+          <option v-for="i in INTELLIGENCES" :key="i" :value="i">{{ i }}</option>
         </select>
       </label>
 
       <label class="field">
         <span class="field__label">知覚</span>
-        <select
-          :value="perception"
-          @change="onSelectInput<Perception>((v) => (perception = v))($event)"
-        >
+        <select v-model="perception">
           <option v-for="p in PERCEPTIONS" :key="p" :value="p">{{ p }}</option>
         </select>
       </label>
 
       <label class="field">
         <span class="field__label">反応</span>
-        <select :value="reaction" @change="onSelectInput<Reaction>((v) => (reaction = v))($event)">
+        <select v-model="reaction">
           <option v-for="r in REACTIONS" :key="r" :value="r">{{ r }}</option>
         </select>
       </label>
 
-      <label class="field">
-        <span class="field__label">穢れ</span>
-        <input
-          type="number"
-          min="0"
-          step="1"
-          :value="impurity"
-          @input="(e) => (impurity = onNumberInput(e, 0, 0))"
-        />
-      </label>
+      <NumberField v-model="impurity" label="穢れ" suffix="" :min="0" :step="1" />
 
       <label class="field">
         <span class="field__label">言語</span>
-        <input
-          type="text"
-          :value="language"
-          placeholder="例: ゴブリン語"
-          @input="onTextInput((v) => (language = v))"
-        />
+        <input type="text" v-model="language" placeholder="例: ゴブリン語" />
       </label>
 
       <label class="field">
         <span class="field__label">生息地</span>
-        <input
-          type="text"
-          :value="habitat"
-          placeholder="例: 森林"
-          @input="onTextInput((v) => (habitat = v))"
-        />
+        <input type="text" v-model="habitat" placeholder="例: 森林" />
       </label>
 
       <NumberField v-model="fame" label="知名度" suffix="" />
@@ -153,7 +90,7 @@ const resistSuffix = (n: number, totalSword: number) => {
 
       <label class="field field--wide">
         <span class="field__label">弱点</span>
-        <input type="text" :value="weakness" @input="onTextInput((v) => (weakness = v))" />
+        <input type="text" v-model="weakness" />
       </label>
 
       <NumberField v-model="initiative" label="先制値" suffix="" />
