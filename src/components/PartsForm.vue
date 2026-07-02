@@ -30,6 +30,11 @@ const onDamage = (i: number) => (e: Event) => {
   setAt(i, { damage: target.value })
 }
 
+type NumericKey = 'accuracy' | 'evasion' | 'defense' | 'hp' | 'mp' | 'swordFragment'
+
+const onPartField = (i: number, key: NumericKey) => (v: number) =>
+  setAt(i, { [key]: v } as Partial<Part>)
+
 const addPart = () => {
   updateParts([
     ...props.modelValue,
@@ -96,22 +101,52 @@ const mpSuffix = (sword: number) => `+${sword}`
           />
         </label>
 
-        <NumberField v-model="part.accuracy" label="命中力" :suffix="accuracySuffixAt(i)" />
+        <NumberField
+          :model-value="part.accuracy"
+          label="命中力"
+          :suffix="accuracySuffixAt(i)"
+          @update:model-value="onPartField(i, 'accuracy')"
+        />
 
         <label class="field">
           <span class="field__label">打撃点</span>
           <input type="text" :value="part.damage" @input="onDamage(i)" />
         </label>
 
-        <NumberField v-model="part.evasion" label="回避力" :suffix="evasionSuffixAt(i)" />
+        <NumberField
+          :model-value="part.evasion"
+          label="回避力"
+          :suffix="evasionSuffixAt(i)"
+          @update:model-value="onPartField(i, 'evasion')"
+        />
 
-        <NumberField v-model="part.defense" label="防護点" suffix="" />
+        <NumberField
+          :model-value="part.defense"
+          label="防護点"
+          suffix=""
+          @update:model-value="onPartField(i, 'defense')"
+        />
 
-        <NumberField v-model="part.hp" label="HP" :suffix="hpSuffix(totalSwordFragment)" />
+        <NumberField
+          :model-value="part.hp"
+          label="HP"
+          :suffix="hpSuffix(totalSwordFragment)"
+          @update:model-value="onPartField(i, 'hp')"
+        />
 
-        <NumberField v-model="part.mp" label="MP" :suffix="mpSuffix(totalSwordFragment)" />
+        <NumberField
+          :model-value="part.mp"
+          label="MP"
+          :suffix="mpSuffix(totalSwordFragment)"
+          @update:model-value="onPartField(i, 'mp')"
+        />
 
-        <NumberField v-model="part.swordFragment" label="剣のかけら" suffix="" />
+        <NumberField
+          :model-value="part.swordFragment"
+          label="剣のかけら"
+          suffix=""
+          @update:model-value="onPartField(i, 'swordFragment')"
+        />
       </div>
     </div>
   </section>
