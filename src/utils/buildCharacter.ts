@@ -1,6 +1,7 @@
 import type { Character, CharacterClipboardData } from './ccfolia'
 import type { EnemyData } from '@/types/enemy'
 import { parsePartName } from './parser'
+import { resistBonus } from './resist'
 
 const buildStatus = (data: EnemyData) => {
   const status: { label: string; value: number; max: number }[] = []
@@ -19,6 +20,8 @@ const buildStatus = (data: EnemyData) => {
 }
 
 const buildParams = (data: EnemyData) => {
+  const totalSword = data.parts.reduce((sum, p) => sum + p.swordFragment, 0)
+  const bonus = resistBonus(totalSword)
   const params: { label: string; value: string }[] = [
     { label: '生命抵抗修正', value: '0' },
     { label: '精神抵抗修正', value: '0' },
@@ -26,8 +29,8 @@ const buildParams = (data: EnemyData) => {
     { label: '命中修正', value: '0' },
     { label: '打撃修正', value: '0' },
     { label: 'LV', value: String(data.level) },
-    { label: '生命抵抗', value: String(data.lifeResist) },
-    { label: '精神抵抗', value: String(data.mindResist) },
+    { label: '生命抵抗', value: String(data.lifeResist + bonus) },
+    { label: '精神抵抗', value: String(data.mindResist + bonus) },
   ]
   data.parts.forEach((p, i) => {
     params.push({ label: `命中${i + 1}`, value: String(p.accuracy) })
@@ -53,8 +56,12 @@ const buildMemo = (data: EnemyData): string => {
   lines.push(`知能：${data.intelligence}　知覚：${data.perception}　反応：${data.reaction}`)
   lines.push(`言語：${data.language}　生息地：${data.habitat}`)
   lines.push(`知名度／弱点値：${data.fame}／${data.weaknessValue}　弱点：${data.weakness}`)
+  const totalSword = data.parts.reduce((sum, p) => sum + p.swordFragment, 0)
+  const bonus = resistBonus(totalSword)
+  const lifeResistTotal = data.lifeResist + bonus
+  const mindResistTotal = data.mindResist + bonus
   lines.push(
-    `先制値：${data.initiative}　移動速度：${data.speed}　生命抵抗力：${data.lifeResist}（${data.lifeResist + 7}）　精神抵抗力：${data.mindResist}（${data.mindResist + 7}）`,
+    `先制値：${data.initiative}　移動速度：${data.speed}　生命抵抗力：${lifeResistTotal}（${lifeResistTotal + 7}）　精神抵抗力：${mindResistTotal}（${mindResistTotal + 7}）`,
   )
   lines.push('----------')
   lines.push('攻撃方法（部位）/命中力/打撃点/回避力/防護点/HP/MP')

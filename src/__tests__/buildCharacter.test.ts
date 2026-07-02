@@ -175,6 +175,28 @@ describe('buildCharacterData', () => {
     expect(status[1]).toEqual({ label: 'MP', value: 5, max: 5 })
   })
 
+  it('params の生命抵抗・精神抵抗に剣のかけらボーナスが反映される', () => {
+    const data = makeEnemy({
+      lifeResist: 5,
+      mindResist: 8,
+      parts: [makePart({ swordFragment: 3 })],
+    })
+    const params = buildCharacterData(data).data.params
+    expect(params[6]).toEqual({ label: '生命抵抗', value: '6' })
+    expect(params[7]).toEqual({ label: '精神抵抗', value: '9' })
+  })
+
+  it('memo の生命抵抗力・精神抵抗力に剣のかけらボーナスが反映される', () => {
+    const data = makeEnemy({
+      name: 'ゴブリン',
+      lifeResist: 5,
+      mindResist: 8,
+      parts: [makePart({ swordFragment: 3 })],
+    })
+    const memo = buildCharacterData(data).data.memo
+    expect(memo).toContain('生命抵抗力：6（13）　精神抵抗力：9（16）')
+  })
+
   it('character の基本プロパティが固定値で出力される', () => {
     const result = buildCharacterData(makeEnemy())
     expect(result.data.x).toBe(0)
